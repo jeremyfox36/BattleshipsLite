@@ -43,6 +43,18 @@ namespace BattleshipLite
             return output;
         }
 
+        private static void PlaceShips(PlayerInfoModel model)
+        {
+            do
+            {
+                Console.Write($"Where do you want to place ship number { model.ShipLocations.Count + 1 }: ");
+                string location = Console.ReadLine();
+
+                bool isValidLocation = GameLogic.StoreShot(model, location);
+
+            } while (model.ShipLocations.Count < 5);
+        }
+
         static void GetUsersShipPlacements()
         {
 

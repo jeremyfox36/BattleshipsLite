@@ -50,5 +50,10 @@ namespace BattleshipsLibrary
 
             model.ShotGrid.Add(spot);
         }
+
+        public static bool StoreShot(PlayerInfoModel model, string location)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
