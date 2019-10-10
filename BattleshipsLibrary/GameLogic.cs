@@ -39,6 +39,11 @@ namespace BattleshipsLibrary
             }
         }
 
+        public static bool PlayerStillActive(PlayerInfoModel opponent)
+        {
+            throw new NotImplementedException();
+        }
+
         private static void AddGridSpot(PlayerInfoModel model, string letter, int number)
         {
             GridSpotModel spot = new GridSpotModel
@@ -51,7 +56,7 @@ namespace BattleshipsLibrary
             model.ShotGrid.Add(spot);
         }
 
-        public static bool StoreShot(PlayerInfoModel model, string location)
+        public static bool PlaceShip(PlayerInfoModel model, string location)
         {
             throw new NotImplementedException();
         }
