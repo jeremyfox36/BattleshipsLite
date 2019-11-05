@@ -1,9 +1,6 @@
 ﻿using BattleshipsLibrary.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BattleshipsLibrary
 {
@@ -41,7 +38,18 @@ namespace BattleshipsLibrary
 
         public static bool PlayerStillActive(PlayerInfoModel opponent)
         {
-            throw new NotImplementedException();
+
+            foreach(GridSpotModel spot in opponent.ShotGrid)
+            {
+                
+                if(spot.Status == GridSpotStatus.Sunk)
+                {
+
+                }
+            }
+            //count number of ships - not necessary unless number of ships becomes a variable
+            //if all player ships are sunk then player is not longer active
+
         }
 
         private static void AddGridSpot(PlayerInfoModel model, string letter, int number)
@@ -56,7 +64,32 @@ namespace BattleshipsLibrary
             model.ShotGrid.Add(spot);
         }
 
+        public static int GetShotCount(PlayerInfoModel winner)
+        {
+            throw new NotImplementedException();
+        }
+
         public static bool PlaceShip(PlayerInfoModel model, string location)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static (string row, int column) SplitShotIntoRowAndColumn(string shot)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool ValidateShot(PlayerInfoModel activePlayer, string row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static bool IdentifyShotResult(PlayerInfoModel opponent, string row, int column)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void MarkShotResult(PlayerInfoModel activePlayer, string row, int column, bool isAHit)
         {
             throw new NotImplementedException();
         }
