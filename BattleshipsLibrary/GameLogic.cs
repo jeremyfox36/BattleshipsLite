@@ -1,6 +1,7 @@
 ﻿using BattleshipsLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BattleshipsLibrary
 {
@@ -38,17 +39,14 @@ namespace BattleshipsLibrary
 
         public static bool PlayerStillActive(PlayerInfoModel opponent)
         {
-
-            foreach(GridSpotModel spot in opponent.ShotGrid)
+            // if there are no spots with a GridSpotStatus of Ship, then there are no ships left
+            int shipsLeft = opponent.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Ship);
+            if(shipsLeft == 0)
             {
-                
-                if(spot.Status == GridSpotStatus.Sunk)
-                {
-
-                }
+                return false;
             }
-            //count number of ships - not necessary unless number of ships becomes a variable
-            //if all player ships are sunk then player is not longer active
+            return true;
+            
 
         }
 
@@ -66,17 +64,25 @@ namespace BattleshipsLibrary
 
         public static int GetShotCount(PlayerInfoModel winner)
         {
-            throw new NotImplementedException();
+            int numHits = winner.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Hit);
+            int numMisses = winner.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Miss);
+
+            return numHits + numMisses;
         }
 
         public static bool PlaceShip(PlayerInfoModel model, string location)
         {
-            throw new NotImplementedException();
+            (string row, int column) = SplitShotIntoRowAndColumn(location);
+
+            model.ShipLocations.Add(new GridSpotModel{ SpotLetter = row, SpotNumber = column});
         }
 
         public static (string row, int column) SplitShotIntoRowAndColumn(string shot)
         {
-            throw new NotImplementedException();
+            string row = Convert.ToString(shot[0]);
+            int column = Convert.ToInt32(shot[1]);
+
+            return (row, column);
         }
 
         public static bool ValidateShot(PlayerInfoModel activePlayer, string row, int column)
