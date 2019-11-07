@@ -87,11 +87,19 @@ namespace BattleshipsLibrary
 
         public static bool ValidateShot(PlayerInfoModel activePlayer, string row, int column)
         {
+            
+            bool rowOK = activePlayer.ShotGrid.Any(spot => spot.SpotLetter == row);
+            bool colOK = activePlayer.ShotGrid.Any(spot => spot.SpotNumber == column);
+
+            return rowOK && colOK;
+            
             throw new NotImplementedException();
         }
 
         public static bool IdentifyShotResult(PlayerInfoModel opponent, string row, int column)
         {
+            //find out if letter and number of shot are in shiplocations list.
+            bool isAHit = opponent.ShipLocations.Any()
             throw new NotImplementedException();
         }
 
