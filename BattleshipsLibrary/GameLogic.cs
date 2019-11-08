@@ -99,13 +99,21 @@ namespace BattleshipsLibrary
         public static bool IdentifyShotResult(PlayerInfoModel opponent, string row, int column)
         {
             //find out if letter and number of shot are in shiplocations list.
-            bool isAHit = opponent.ShipLocations.Any()
+            List<GridSpotModel> shipLocations = opponent.ShipLocations;
+            foreach(GridSpotModel spot in shipLocations )
+            {
+                if(spot.SpotLetter == row && spot.SpotNumber == column)
+                {
+                    return true;
+                }
+                return false;
+            }
             throw new NotImplementedException();
         }
 
         public static void MarkShotResult(PlayerInfoModel activePlayer, string row, int column, bool isAHit)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
