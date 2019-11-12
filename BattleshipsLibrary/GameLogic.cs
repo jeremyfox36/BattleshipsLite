@@ -37,17 +37,18 @@ namespace BattleshipsLibrary
             }
         }
 
-        public static bool PlayerStillActive(PlayerInfoModel opponent)
+        public static bool PlayerStillActive(PlayerInfoModel player)
         {
+            bool isActive = false;
             // if there are no spots with a GridSpotStatus of Ship, then there are no ships left
-            int shipsLeft = opponent.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Ship);
-            if(shipsLeft == 0)
+            foreach (var ship in player.ShipLocations)
             {
-                return false;
+                if (ship.Status != GridSpotStatus.Sunk)
+                {
+                    isActive = true;
+                }
             }
-            return true;
-            
-
+            return isActive;
         }
 
         private static void AddGridSpot(PlayerInfoModel model, string letter, int number)
@@ -62,58 +63,154 @@ namespace BattleshipsLibrary
             model.ShotGrid.Add(spot);
         }
 
-        public static int GetShotCount(PlayerInfoModel winner)
+        public static int GetShotCount(PlayerInfoModel player)
         {
-            int numHits = winner.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Hit);
-            int numMisses = winner.ShotGrid.Count(gridSpot => gridSpot.Status == GridSpotStatus.Miss);
-
-            return numHits + numMisses;
+            int shotCount = 0;
+            foreach (var shot in player.ShotGrid)
+            {
+                if (shot.Status != GridSpotStatus.Empty)
+                {
+                    shotCount += 1;
+                }
+            }
+            return shotCount;
         }
 
         public static bool PlaceShip(PlayerInfoModel model, string location)
         {
+            bool output = false;
             (string row, int column) = SplitShotIntoRowAndColumn(location);
 
-            model.ShipLocations.Add(new GridSpotModel{ SpotLetter = row, SpotNumber = column});
+            bool isValidLocation = ValidateGridLocation(model, row, column);
+            bool isSpotOpen = ValidateShipLocation(model, row, column);
+
+
+            if (isValidLocation == true && isSpotOpen == true)
+            {
+                model.ShipLocations.Add(new GridSpotModel
+                {
+                    SpotLetter = row.ToUpper(),
+                    SpotNumber = column,
+                    Status = GridSpotStatus.Ship
+                });
+            }
+
+            output = true;
+            return output;
+        }
+
+        private static bool ValidateShipLocation(PlayerInfoModel model, string row, int column)
+        {
+            bool isValidLocation = true;
+
+            foreach (var ship in model.ShipLocations)
+            {
+                if (ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
+                {
+                    isValidLocation = false;
+                }
+            }
+
+            return isValidLocation;
+        }
+
+        private static bool ValidateGridLocation(PlayerInfoModel model, string row, int column)
+        {
+            bool isValidLocation = false;
+
+            foreach (var ship in model.ShotGrid)
+            {
+                if (ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
+                {
+                    isValidLocation = true;
+                }
+            }
+
+            return isValidLocation;
+
         }
 
         public static (string row, int column) SplitShotIntoRowAndColumn(string shot)
         {
-            string row = Convert.ToString(shot[0]);
-            int column = Convert.ToInt32(shot[1]);
+            if (shot.Length != 2)
+            {
+                throw new ArgumentException("This was an invalid shot type", "shot");
+            }
+
+            char[] shotArray = shot.ToArray();
+
+            string row = "";
+            int column = 0;
+
+            row = Convert.ToString(shotArray[0]);
+            column = Convert.ToInt32(shotArray[1].ToString());
 
             return (row, column);
         }
 
-        public static bool ValidateShot(PlayerInfoModel activePlayer, string row, int column)
+        public static bool ValidateShot(PlayerInfoModel player, string row, int column)
         {
-            
-            bool rowOK = activePlayer.ShotGrid.Any(spot => spot.SpotLetter == row);
-            bool colOK = activePlayer.ShotGrid.Any(spot => spot.SpotNumber == column);
+            bool isValidShot = false;
 
-            return rowOK && colOK;
-            
-            throw new NotImplementedException();
+            foreach (var gridSpot in player.ShotGrid)
+            {
+                if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
+                {
+                    if (gridSpot.Status == GridSpotStatus.Empty)
+                    {
+                        isValidShot = true;
+                    }
+                }
+            }
+
+            return isValidShot;
+
+            //bool rowOK = player.ShotGrid.Any(spot => spot.SpotLetter == row);
+            //bool colOK = player.ShotGrid.Any(spot => spot.SpotNumber == column);
+
+            //return rowOK && colOK;
+
+            //throw new NotImplementedException();
         }
 
         public static bool IdentifyShotResult(PlayerInfoModel opponent, string row, int column)
         {
-            //find out if letter and number of shot are in shiplocations list.
-            List<GridSpotModel> shipLocations = opponent.ShipLocations;
-            foreach(GridSpotModel spot in shipLocations )
+            bool isAHit = false;
+
+            foreach (var ship in opponent.ShipLocations)
             {
-                if(spot.SpotLetter == row && spot.SpotNumber == column)
+                if (ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
                 {
-                    return true;
+                    isAHit = true;
                 }
-                return false;
             }
-            throw new NotImplementedException();
+
+            return isAHit;
         }
 
-        public static void MarkShotResult(PlayerInfoModel activePlayer, string row, int column, bool isAHit)
+        public static void MarkShotResult(PlayerInfoModel activePlayer, PlayerInfoModel opponent, string row, int column, bool isAHit)
         {
-            
-        }
+            foreach (var gridSpot in activePlayer.ShotGrid)
+            {
+                if (gridSpot.SpotLetter == row.ToUpper() && gridSpot.SpotNumber == column)
+                {
+                    if (isAHit)
+                    {
+                        gridSpot.Status = GridSpotStatus.Hit;
+                        foreach(var ship in opponent.ShipLocations)
+                        {
+                            if(ship.SpotLetter == row.ToUpper() && ship.SpotNumber == column)
+                            {
+                                ship.Status = GridSpotStatus.Sunk;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        gridSpot.Status = GridSpotStatus.Miss;
+                    }
+                }
+            }
+        }   
     }
 }
